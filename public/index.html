@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>じゃんけん | ともじゃん</title>
+  <link rel="stylesheet" href="/style.css">
+</head>
+<body>
+  <header class="top-bar">
+    <div class="inner">
+      <span class="brand">ともじゃん <span class="beta">β版</span></span>
+      <a class="back" id="back-tomohane" href="#">← ともはねにもどる</a>
+    </div>
+  </header>
+  <main class="page">
+    <!-- ログインしていない -->
+    <section id="signin" class="card center" hidden>
+      <img src="/avatars/shiba.svg" alt="" width="72" height="72">
+      <h1>シバの家で じゃんけん！</h1>
+      <p>ともはねのアカウントで遊べるっす。勝ち数は ともはね の飾りにつながるっす！</p>
+      <a class="btn big" id="signin-link" href="#">ともはねでログイン</a>
+      <p class="muted small">ゲームに渡すのは、表示名と年齢の区分だけです（対戦の組み合わせに使います）。</p>
+    </section>
+
+    <!-- ログインしている -->
+    <div id="app" hidden>
+      <section class="card me-card">
+        <p><strong id="me-name"></strong> さん <span class="tag" id="me-age"></span> <span class="tag" id="me-level"></span></p>
+        <p class="muted small" id="me-stats"></p>
+      </section>
+
+      <section class="card" id="lobby">
+        <div class="say"><img src="/avatars/shiba.svg" alt="" width="48" height="48">
+          <p id="lobby-say">じゃんけん3本勝負っす！ 2回勝ったら勝ちっす！</p></div>
+        <button type="button" class="btn big" id="find">✊ 対戦をさがす</button>
+        <p class="error" id="error" role="alert"></p>
+      </section>
+
+      <section class="card" id="waiting" hidden aria-live="polite">
+        <div class="say"><img src="/avatars/yamaneko.svg" alt="" width="48" height="48">
+          <p>年齢の区分が同じで、うでまえが近い人をさがしている…（<span id="wait-sec">0</span>秒）<br>
+          <span class="muted small">30秒見つからなければ、シバが相手をする。</span></p></div>
+        <button type="button" class="btn ghost" id="cancel">やめる</button>
+      </section>
+
+      <section class="card" id="match" hidden>
+        <p class="reason" id="reason"></p>
+        <div class="versus">
+          <div><p class="muted small">わたし</p><p class="score" id="my-score">0</p></div>
+          <p class="vs">VS</p>
+          <div><p class="muted small" id="opp-name"></p><p class="score" id="opp-score">0</p></div>
+        </div>
+        <p class="status" id="status" aria-live="polite"></p>
+        <div class="hands" id="hands" role="group" aria-label="手を出す">
+          <button type="button" class="hand" data-hand="rock"><span aria-hidden="true">✊</span>グー</button>
+          <button type="button" class="hand" data-hand="scissors"><span aria-hidden="true">✌️</span>チョキ</button>
+          <button type="button" class="hand" data-hand="paper"><span aria-hidden="true">✋</span>パー</button>
+        </div>
+        <ol class="rounds" id="rounds"></ol>
+        <div class="stamps" id="stamps" role="group" aria-label="ひとこと"></div>
+        <ul class="stamp-log" id="stamp-log" aria-live="polite"></ul>
+        <button type="button" class="btn big" id="again" hidden>もう一回！</button>
+      </section>
+
+      <section class="card" aria-labelledby="voice-title">
+        <h2 id="voice-title">みんなの声：次はどんなゲームがいい？</h2>
+        <p class="muted small">次のゲームは、みんなの意見をまとめて作ります。いいねが多い意見から考えます。</p>
+        <div class="say" id="summary-say" hidden><img src="/avatars/yamaneko.svg" alt="" width="40" height="40"><p id="summary"></p></div>
+        <form id="opinion-form" class="row">
+          <label class="sr-only" for="opinion">意見</label>
+          <input class="input" id="opinion" maxlength="200" placeholder="例：推しのクイズで対戦したい">
+          <button class="btn" type="submit">送る</button>
+        </form>
+        <p class="error" id="opinion-error" role="alert"></p>
+        <ul class="opinions" id="opinions"></ul>
+      </section>
+    </div>
+  </main>
+  <script type="module" src="/app.js"></script>
+</body>
+</html>
