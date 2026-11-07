@@ -16,7 +16,7 @@ export const STAMPS = ['よろしく！', 'ナイス！', 'ありがとう', '�
 export const BEGINNER_PLAYS = 3; // はじめての3回はシバが相手
 export const WAIT_SAME_LEVEL_MS = 15000; // これより待ったら、うでまえがちがっても組む（年齢の区分は必ず同じ）
 export const WAIT_BOT_MS = 30000; // これより待ったら、シバが相手
-export const CHILD_DAILY_LIMIT = 20; // 子どもの1日の対戦回数
+export const DAILY_LIMIT = 21; // 1日の対戦回数。大人も子どもも同じ（球技の21点にちなむ。2026-11-06 決定）
 const WIN_TO = 2; // 3本勝負（2本先取）
 const MAX_ROUNDS = 9;
 const AGE = { child: '子ども', teen: '中高生', adult: '大人' };
@@ -115,8 +115,8 @@ export function createGame({ now = () => Date.now(), random = (n) => randomInt(n
       const p = requirePlayer(gameId);
       if (currentMatch(gameId)) return;
       if (p.day !== today()) { p.day = today(); p.todayPlays = 0; }
-      if (p.ageGroup === 'child' && p.todayPlays >= CHILD_DAILY_LIMIT) {
-        throw new HttpError(429, `きょうはもう${CHILD_DAILY_LIMIT}回遊んだっす！ また明日あそぶっす（シバ）`);
+      if (p.todayPlays >= DAILY_LIMIT) {
+        throw new HttpError(429, `きょうはもう${DAILY_LIMIT}回遊んだっす！ また明日あそぶっす（シバ）`);
       }
       if (p.plays < BEGINNER_PLAYS) {
         startMatch(gameId, BOT.gameId, `🐕 シバ：はじめての${BEGINNER_PLAYS}回は、オレが相手するっす！ ルールに慣れてほしいっす。`);
@@ -181,7 +181,7 @@ export function createGame({ now = () => Date.now(), random = (n) => randomInt(n
       const q = queue.find((x) => x.gameId === gameId);
       return {
         me: { name: me.name, ageGroup: AGE[me.ageGroup], level: levelOf(me), plays: me.plays, wins: me.wins, losses: me.losses, draws: me.draws,
-          todayLeft: me.ageGroup === 'child' ? CHILD_DAILY_LIMIT - (me.day === today() ? me.todayPlays : 0) : null },
+          todayLeft: DAILY_LIMIT - (me.day === today() ? me.todayPlays : 0) },
         waiting: q ? Math.floor((now() - q.since) / 1000) : null,
         match: match && (match.status === 'playing' || !q) ? match : null,
       };

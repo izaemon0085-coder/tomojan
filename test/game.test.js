@@ -2,7 +2,7 @@ import { test, before, after } from 'node:test';
 import assert from 'node:assert/strict';
 import http from 'node:http';
 import { createApp } from '../server.js';
-import { createGame, judge, levelOf, WAIT_BOT_MS, WAIT_SAME_LEVEL_MS, CHILD_DAILY_LIMIT, BEGINNER_PLAYS } from '../game.js';
+import { createGame, judge, levelOf, WAIT_BOT_MS, WAIT_SAME_LEVEL_MS, DAILY_LIMIT, BEGINNER_PLAYS } from '../game.js';
 
 // ---- ルールと仕分け（ゲームの頭脳だけ） ----
 test('じゃんけんの勝ち負け', () => {
@@ -60,11 +60,18 @@ test('仕分け：年齢の区分がちがう人とは、どんなに待って�
   assert.equal(g.view('adult2').match.opponent.bot, true);
 });
 
-test('子どもは1日に遊べる回数が決まっている', () => {
+test('1日に遊べるのは、大人も子どもも21回まで', () => {
   const { g, add } = setup();
-  add('kid2', 'child');
-  Object.assign(g.player('kid2'), { todayPlays: CHILD_DAILY_LIMIT, day: new Date(0).toISOString().slice(0, 10) });
-  assert.throws(() => g.join('kid2'), /また明日/);
+  assert.equal(DAILY_LIMIT, 21);
+  const day = new Date(0).toISOString().slice(0, 10);
+  for (const [id, age] of [['kid2', 'child'], ['teen2', 'teen'], ['adult3', 'adult']]) {
+    add(id, age);
+    Object.assign(g.player(id), { todayPlays: DAILY_LIMIT - 1, day });
+    assert.doesNotThrow(() => g.join(id), `${age}：20回目までは遊べる`);
+    g.leave?.(id);
+    Object.assign(g.player(id), { todayPlays: DAILY_LIMIT, day });
+    assert.throws(() => g.join(id), /また明日/, `${age}：21回でおしまい`);
+  }
 });
 
 test('うでまえの区分', () => {
